@@ -31,8 +31,15 @@ public:
         for (int i = 0; i <= vertices-1; i++) {
             // FIXME: there are two methods to access members of pointers
             //        use one to fix lhs and the other to fix rhs
-            int lhs = (*points)[i].x * (*points)[i+1].y;
-            int rhs = (points[i+1])->x * (points[i])->y;
+            int t;
+            if (i+1 > vertices-1){
+                t = 0;
+            }
+            else{
+                t = i+1;
+            }
+            int lhs = (*points)[i].x * (*points)[t].y;
+            int rhs = (points[t])->x * (points[i])->y;
             temp += (lhs - rhs);
         }
         double* area = new double(abs(temp)/2.0);
