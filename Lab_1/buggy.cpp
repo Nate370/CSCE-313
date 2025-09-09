@@ -19,6 +19,11 @@ public:
     }
 
     ~Shape () {
+        for (int i = 0; i <= vertices; i++){
+            delete points[i];
+        }
+        vertices = 0;
+        delete[] points;
     }
     void addPoints (Point pts[]) {
         for (int i = 0; i <=  vertices; i++) {
@@ -38,7 +43,7 @@ public:
             else{
                 t = i+1;
             }
-            int lhs = (*points)[i].x * (*points)[t].y;
+            int lhs = (*points[i]).x * (*points[t]).y;
             int rhs = (points[t])->x * (points[i])->y;
             temp += (lhs - rhs);
         }
@@ -85,8 +90,10 @@ int main () {
     double* area = tri->area();
     std::cout << *area << std::endl;
     delete area;
+    delete tri;
 
     area = quad->area();
     std::cout << *area << std::endl;
     delete area;
+    delete quad;
 }
