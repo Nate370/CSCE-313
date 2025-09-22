@@ -25,6 +25,7 @@ int main (int argc, char *argv[]) {
 	bool input_t = false;
 	bool input_e = false;
 	bool input_f = false;
+	bool input_c = false;
 
 	pid_t pid = fork();
 	char *args[] = {(char*)"./server", nullptr};
@@ -33,8 +34,11 @@ int main (int argc, char *argv[]) {
 	}
 	
 	string filename = "";
-	while ((opt = getopt(argc, argv, "p:t:e:f:")) != -1) {
+	while ((opt = getopt(argc, argv, ":cp:t:e:f:")) != -1) {
 		switch (opt) {
+			case 'c':
+				input_c = true;
+				break;
 			case 'p':
 				p = atoi (optarg);
 				input_p = true;
@@ -53,9 +57,20 @@ int main (int argc, char *argv[]) {
 				break;
 		}
 	}
+	FIFORequestChannel chan("control", FIFORequestChannel::CLIENT_SIDE);
+	if (input_c){
+		MESSAGE_TYPE channel_message = NEWCHANNEL_MSG;
+		char new_channel[30];
+		chan.cwrite(&channel_message, sizeof(MESSAGE_TYPE));
+		chan.cread(new_channel, 30);
+		string new_channel_string(new_channel);
+		FIFORequestChannel new_chan(new_channel_string.data(), FIFORequestChannel::CLIENT_SIDE);
+		chan = new_chan;
+	}
 
-    FIFORequestChannel chan("control", FIFORequestChannel::CLIENT_SIDE);
-	
+
+    //FIFORequestChannel chan("control", FIFORequestChannel::CLIENT_SIDE);
+if (input_p || input_t || input_e || (!input_p && !input_t && !input_e)){
 	// example data point request
     char buf[MAX_MESSAGE]; // 256
     datamsg x(p, t, e);
@@ -86,6 +101,7 @@ int main (int argc, char *argv[]) {
 		chan.cread(&reply, sizeof(double)); //answer
 		cout << "For person " << p << ", at time " << t << ", the value of ecg " << e << " is " << reply << endl;
 	}
+}
 if (input_f){	
     // sending a non-sense message, you need to change this
 	filemsg fm(0, 0);
