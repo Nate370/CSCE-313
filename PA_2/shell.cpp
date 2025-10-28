@@ -27,26 +27,33 @@ int main () {
     int og_stdin = dup(STDIN_FILENO);
     char* args[256];
     size_t j;
-    //string curr_cmd;
     string file_name;
     int fd = -1;
     pid_t pid;
     vector<pid_t> pids;
     vector<pid_t> background_pids;
     int status;
+
+    char* prev_dir;
+    char* prev_dir_buf;
+    dir_size = pathconf(".", _PC_PATH_MAX);
+    if ((prev_dir_buf = (char*)malloc(dir_size)) != NULL){
+        prev_dir = getcwd(prev_dir_buf, dir_size);
+    }
+
     for (;;) {
         pids.clear();
 
         // need date/time, username, and absolute path to current dir
         time_t t;
         time(&t);
-        char* curr_time = ctime(&t);
+        std::string curr_time(ctime(&t));
         char* curr_user = getenv("USER");
         dir_size = pathconf(".", _PC_PATH_MAX);
         if ((dir_buf = (char*)malloc(dir_size)) != NULL){
             curr_dir = getcwd(dir_buf, dir_size);
         }
-        cout << YELLOW << curr_time << " " << curr_user << ":" << curr_dir << "$" << NC << " ";
+        cout << YELLOW << curr_time.substr(0, curr_time.size()-1) << " " << curr_user << ":" << curr_dir << "$" << NC << " ";
         free(dir_buf);
 
         bool backgrounds_done = false;
@@ -84,7 +91,7 @@ int main () {
 
         // print out every command token-by-token on individual lines
         // prints to cerr to avoid influencing autograder
-        /*for (auto cmd : tknr.commands) {
+        for (auto cmd : tknr.commands) {
             for (auto str : cmd->args) {
                 cerr << "|" << str << "| ";
             }
@@ -95,7 +102,24 @@ int main () {
                 cerr << "out> " << cmd->out_file << " ";
             }
             cerr << endl;
-        }*/
+        }
+        
+        if (tknr.commands.at(0)->args.at(0).compare("cd") == 0){
+            std::string prev(prev_dir);
+            free(prev_dir_buf);
+            dir_size = pathconf(".", _PC_PATH_MAX);
+            if ((prev_dir_buf = (char*)malloc(dir_size)) != NULL){
+                prev_dir = getcwd(prev_dir_buf, dir_size);
+            }
+            if (tknr.commands.at(0)->args.at(1).compare("-") == 0){
+                cout << prev << endl;
+                chdir((char*) prev.c_str());
+            }
+            else{
+                chdir((char*) tknr.commands.at(0)->args.at(1).c_str());
+            }
+            continue;
+        }
 
         for (size_t i = 0; i < num_cmds; i++){
             int pipe_fd[2];
@@ -127,7 +151,7 @@ int main () {
                     fd = open((char*) tknr.commands.at(i)->out_file.c_str(), O_CREAT|O_WRONLY|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH);
                     dup2(fd, STDOUT_FILENO);
                 }
-                else if (tknr.commands.at(i)->hasInput()){
+                if (tknr.commands.at(i)->hasInput()){
                     fd = open((char*) tknr.commands.at(i)->in_file.c_str(), O_CREAT|O_RDONLY, S_IRUSR|S_IWUSR|S_IWGRP|S_IWOTH);
                     dup2(fd, STDIN_FILENO);
                 }
@@ -160,4 +184,5 @@ int main () {
             }
         }
     }
+    free(prev_dir_buf);
 }
