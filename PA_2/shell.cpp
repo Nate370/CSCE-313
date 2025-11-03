@@ -23,7 +23,8 @@ int main () {
     char* dir_buf;
     size_t dir_size;
     char* curr_dir = NULL;
-    //int og_stdout = dup(STDOUT_FILENO);
+    char* curr_user;
+
     int og_stdin = dup(STDIN_FILENO);
     char* args[256];
     size_t j;
@@ -48,7 +49,10 @@ int main () {
         time_t t;
         time(&t);
         std::string curr_time(ctime(&t));
-        char* curr_user = getenv("USER");
+        if ((curr_user = getenv("USER")) == NULL){
+            curr_user = (char*) "root";
+        }
+
         dir_size = pathconf(".", _PC_PATH_MAX);
         if ((dir_buf = (char*)malloc(dir_size)) != NULL){
             curr_dir = getcwd(dir_buf, dir_size);
@@ -91,7 +95,7 @@ int main () {
 
         // print out every command token-by-token on individual lines
         // prints to cerr to avoid influencing autograder
-        for (auto cmd : tknr.commands) {
+        /*for (auto cmd : tknr.commands) {
             for (auto str : cmd->args) {
                 cerr << "|" << str << "| ";
             }
@@ -102,9 +106,12 @@ int main () {
                 cerr << "out> " << cmd->out_file << " ";
             }
             cerr << endl;
-        }
+        }*/
         
         if (tknr.commands.at(0)->args.at(0).compare("cd") == 0){
+            if (tknr.commands.at(0)->args.size() <= 1){
+                continue;
+            }
             std::string prev(prev_dir);
             free(prev_dir_buf);
             dir_size = pathconf(".", _PC_PATH_MAX);
