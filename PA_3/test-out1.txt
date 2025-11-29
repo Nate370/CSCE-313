@@ -1,0 +1,16 @@
+Added task
+Started task
+Added task
+Started task
+Added task
+Called Stop()
+Started task
+Stopping thread
+Stopping thread
+Finished task
+Finished task
+Finished task
+Stopping thread
+Stopping thread
+Stopping thread
+Cannot add task to queue

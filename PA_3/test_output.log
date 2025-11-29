@@ -1,0 +1,46 @@
+To remove colour from tests, set COLOUR to 1 in sh file
+
+[0;33mCompiling source...[0m
+
+ [0;32mCompilation succeeded[0m
+
+SCORE: 0/100
+
+[0;33m[Test 1] SubmitTask() adds tasks to queue[0m
+ [0;32mPassed[0m
+
+SCORE: 10/100
+
+[0;33m[Test 2] Threads start and finish tasks[0m
+ [0;32mPassed[0m
+
+SCORE: 25/100
+
+[0;33m[Test 3] Stop() cleanly terminates threads[0m
+ [0;32mPassed[0m
+
+SCORE: 40/100
+
+[0;33m[Test 4] Handles multiple concurrent tasks[0m
+ [0;32mPassed[0m
+
+SCORE: 60/100
+
+[0;33m[Test 5] Submitting after Stop() prevented[0m
+ [0;32mPassed[0m
+
+SCORE: 70/100
+
+[0;33m[Test 6] Memory errors (ASAN)[0m
+ [0;32mPassed[0m
+
+SCORE: 85/100
+
+[0;33m[Test 7] remove_task() removes from queue[0m
+ [0;32mPassed[0m
+
+SCORE: 100/100
+
+[0;33mFinal Score: 100/100[0m
+
+[0;32mAll tests passed![0m
